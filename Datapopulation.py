@@ -38,5 +38,10 @@ with open("data/users.json") as f:
     data = json.load(f)
     for user in data:
         populateTableFromJson('userTable',user)
+with open("data/tweets.json") as f:
+    data = json.load(f)
+    for tweet in data:
+        populateTableFromJson('processedTweets',tweet)
+
 
 

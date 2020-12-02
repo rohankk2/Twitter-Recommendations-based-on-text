@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+from db.dbFactory import dbFactory
 
 
 def create_connection(db_file):
@@ -33,8 +34,8 @@ def create_table(conn, create_table_sql):
 
 def main():
     #if you need to change the db path here you go
-    database = r"/Users/cesiabulnes/Desktop/CS410/final_project/Twitter-Recommendations-based-on-text/db/pythonsqlite.db"
-
+    factory = dbFactory()
+    factory.set_connection()
     sql_original_tweets_table = """CREATE TABLE IF NOT EXISTS originalTweets (
                                         id text PRIMARY KEY,
                                         tweet_text text, 
@@ -122,29 +123,7 @@ def main():
     sql_processed_tweets_table = """CREATE TABLE IF NOT EXISTS processedTweets (
                                         id text PRIMARY KEY REFERENCES originalTweets (id),
                                         tweet_text text, 
-                                        created_at text,
-                                        author_id text,
-                                        conversation_id text,
-                                        context_annotations text,
-                                        context_annotations_domain text,
-                                        context_annotations_domain_id text,
-                                        context_annotations_domain_name text,
-                                        context_annotations_domain_description text,
-                                        context_annotations_entity text,
-                                        context_annotations_entity_id text,
-                                        context_annotations_entity_name text,
-                                        context_annotations_entity_description text,
-                                        entities text,
-                                        entities_annotations text,
-                                        entities_annotations_start integer,
-                                        entities_annotations_end integer,
-                                        entities_annotations_probability real,
-                                        entities_annotations_type text,
-                                        entities_annotations_normalized_text text,                                
-                                        public_metrics text,
-                                        public_metrics_retweet_count integer,
-                                        public_metrics_reply_count integer,
-                                        public_metrics_like_count integer
+                                        author_id text
                                     );"""
     #                                         FOREIGN KEY (id) REFERENCES originalTweets (id)
     sql_user_table = """CREATE TABLE IF NOT EXISTS userTable (
@@ -188,26 +167,20 @@ def main():
                                             category_id_str text, 
                                             category text REFERENCES processedTweets (context_annotations),
                                             count_of_users_per_cat integer
-                                            
-
                                         );"""
     # FOREIGN KEY (category) REFERENCES processedTweets (context_annotations)
     # for referenced tweets use json encode/decode forgot which one
 
-    conn = create_connection(database)
+    conn = factory.get_connection()
 
     # create tables
     if conn is not None:
         # create projects table
-        create_table(conn, sql_original_tweets_table)
+        #create_table(conn, sql_original_tweets_table)
         create_table(conn, sql_processed_tweets_table)
-        create_table(conn, sql_user_table)
-        create_table(conn, sql_user_category_table)
-        create_table(conn, sql_tweet_category_table)
-
-
-
-
+        # create_table(conn, sql_user_table)
+        #create_table(conn, sql_user_category_table)
+        # create_table(conn, sql_tweet_category_table)
     else:
         print("Error! cannot create the database connection.")
 
