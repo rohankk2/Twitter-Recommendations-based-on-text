@@ -157,6 +157,7 @@ class Corpus(object):
 
 
 
+
 def main():
     documents_path = 'data/tweets.json'
     corpus = Corpus(documents_path)  # instantiate corpus
