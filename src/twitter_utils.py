@@ -7,6 +7,7 @@ from os import path
 
 class TwitterUtils(object):
     def __init__(self, consumer_key, consumer_secret, access_token, access_token_secret, bearer_token):
+        """Initializer function for TwitterUtils. Sets up the python-twitter package with creds."""
         self.bearer_token = bearer_token
 
         self.api = twitter.Api(consumer_key=consumer_key,
@@ -15,8 +16,11 @@ class TwitterUtils(object):
                                access_token_secret=access_token_secret,
                                sleep_on_rate_limit=True)
 
-    # Gets the num_of_users random public Twitter users for sample stream API
     def get_random_users(self, num_of_users):
+        """
+        Gets num_of_users amount of users from the Twitter Sample Stream.
+        These users are filtered to only english speaking and public users.
+        """
         users = []
         while True:
             try:
@@ -36,8 +40,6 @@ class TwitterUtils(object):
                         user_json = self.api.GetUser(id, return_json=True)
 
                         # If user is protected we can't see their tweets. Also we only want english
-                        # print(user_json['status']['lang'])
-                        # if user_json['protected'] is True or not user_json['status']['lang'] == "en":
                         if user_json['protected'] is True:
                             break
 
@@ -51,6 +53,10 @@ class TwitterUtils(object):
                 pass
 
     def get_user_tweets(self, screen_name=None):
+        """
+        Gets the tweet IDs from a user from the last 7 days. Doens't include retweets
+        or replies, only statuses.
+        """
         try:
             timeline = self.api.GetUserTimeline(screen_name=screen_name, count=200, include_rts=False, exclude_replies=True)
             earliest_tweet = min(timeline, key=lambda x: x.id).id
@@ -79,6 +85,11 @@ class TwitterUtils(object):
         return timeline
 
     def get_tweet_data_v2(self, ids):
+        """
+        Gets full tweet data using the v2 Twitter API. This includes annotations
+        and entities.
+        """
+        # We need to limit each chunk to 100 due to Twitter API limits
         chunks = [ids[x:x+100] for x in range(0, len(ids), 100)]
         count = 0
 
@@ -111,6 +122,7 @@ class TwitterUtils(object):
 
 
 if __name__ == "__main__":
+    # Twitter API keys. Get from Twitter Developer Portal
     CONSUMER_KEY = ""
     CONSUMER_SECRET = ""
     ACCESS_TOKEN = ""
@@ -119,8 +131,8 @@ if __name__ == "__main__":
 
     t = TwitterUtils(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET, BEARER_TOKEN)
 
-    # Get random users and dump to file if file doesn't already exist
-    # Delete users.json if you want to regenerate IDs
+    # Get random users from sample stream, check if user is public
+    # and that they Tweet in english
     if not path.exists('data/users.json'):
         users = t.get_random_users(3000)
         with open('data/users.json', 'w') as outfile:
@@ -129,7 +141,8 @@ if __name__ == "__main__":
     with open('data/users.json') as infile:
         users = json.load(infile)
 
-    # Get the tweet IDs from our random users
+    # Get the tweet IDs from the last 7 days from our random users
+    # Ignore retweets and replies, so only statuses
     if not path.exists('data/tweet_ids.json'):
         tweet_ids = []
         for user in users:
@@ -141,7 +154,7 @@ if __name__ == "__main__":
         with open('data/tweet_ids.json', 'w') as outfile:
             json.dump(tweet_ids, outfile, indent=4, sort_keys=True)
 
-    # Get tweet contents
+    # Get tweet contents from v2 api for entity and annotations
     with open('data/tweet_ids.json') as infile:
         tweet_ids = json.load(infile)
 
