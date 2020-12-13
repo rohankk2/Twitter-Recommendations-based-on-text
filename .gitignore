@@ -139,3 +139,4 @@ dmypy.json
 .prof
 
 .idea
+**/*/.DS_Store
