@@ -6,7 +6,7 @@ Rohan Khanna (Team Captain) - rohank2@illinois.edu
 Tyler Wong - tylercw3@illinois.edu
 Cesia Bulnes - cbulnes2@illinois.edu
 
-
+For full documentation please read our pdf report uploaded in this repo: https://github.com/rohankk2/Twitter-Recommendations-based-on-text/blob/main/Twitter%20Recommendations%20based%20on%20Text%20Final%20Report.pdf
 
 ## Introduction
 
